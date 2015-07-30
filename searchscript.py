@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import re
 import os
 import subprocess
-from numbers import Variable
+from .numbers import Variable
 
 class Search(object):
 
