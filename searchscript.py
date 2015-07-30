@@ -170,9 +170,10 @@ class SearchReplace(Search):
 			custom = True
 		if custom and edit is None:
 			rawin = 'i'
-		elif custom:
+		else:
 			rawin = raw_input('confirm %sreplacement: \r' % prompt)
-			sub = edit
+			if custom:
+				sub = edit
 		return self._handle_response(rawin,index,p,no,sub)
 
 	def _handle_y(self, index, p, no, sub):
