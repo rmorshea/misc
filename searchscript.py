@@ -162,13 +162,15 @@ class SearchReplace(Search):
 		try:
 			prompt = ''
 			subprocess.call(cmd.split(' '))
+			custom = False
 		except OSError, e:
 			print('Sublime Text failed: '+e.__repr__())
 			print("provide a *full* custom replacement (hit enter for none):\n")
 			edit = raw_input('NEW ')
-		if edit is None:
+			custom = True
+		if custom and edit is None:
 			rawin = 'i'
-		else:
+		elif custom:
 			rawin = raw_input('confirm %sreplacement: \r' % prompt)
 			sub = edit
 		return self._handle_response(rawin,index,p,no,sub)
