@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import re
 import os
 import subprocess
-from .numbers import Variable
+from numberic import Variable
 
 class Search(object):
 
@@ -163,7 +163,7 @@ class SearchReplace(Search):
 		cmd = 'sublime '+p+':'+str(no+1)+':1'
 		try:
 			prompt = ''
-			subprocess.call([cmd])
+			subprocess.call(cmd.split(' '))
 		except OSError, e:
 			print('Sublime Text failed: '+e.__repr__())
 			print("provide a *full* custom replacement (hit enter for none):\n")

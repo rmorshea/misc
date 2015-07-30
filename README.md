@@ -23,7 +23,7 @@ Once `antipackage` has been imported, you can use any of the modules in this rep
 it using the following syntax:
 
 ```
-from github.rmorshea.misc import numbers
+from github.rmorshea.misc import numberic
 ```
 
 This will automatically download and install the `numbers` module and import it. `antipackage` will
