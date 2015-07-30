@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import re
 import os
 import subprocess
-from numberic import Variable
+from numeric import Variable
 
 class Search(object):
 
@@ -139,7 +139,7 @@ class SearchReplace(Search):
 
 	def _handle_response(self,rawin,index,p,no,sub):
 		if rawin == 'o':
-			return self._handle_o(p,no,sub)
+			return self._handle_o(index,p,no,sub)
 		elif rawin == 'y':
 			self._handle_y(index,p,no,sub)
 		elif rawin == 'q':
@@ -159,7 +159,7 @@ class SearchReplace(Search):
 			self.help()
 			raise ValueError("must enter 'y','n','o','i','q', or 'h'")
 
-	def _handle_o(self, p, no, sub):
+	def _handle_o(self, index, p, no, sub):
 		cmd = 'sublime '+p+':'+str(no+1)+':1'
 		try:
 			prompt = ''
@@ -168,10 +168,11 @@ class SearchReplace(Search):
 			print('Sublime Text failed: '+e.__repr__())
 			print("provide a *full* custom replacement (hit enter for none):\n")
 			edit = raw_input('NEW ')
-			if edit is not None:
-				prompt = 'custom '
-				sub = edit
-		rawin = raw_input('confirm %sreplacement: \r' % prompt)
+		if edit is None:
+			rawin = 'i'
+		else:
+			rawin = raw_input('confirm %sreplacement: \r' % prompt)
+			sub = edit
 		return self._handle_response(rawin,index,p,no,sub)
 
 	def _handle_y(self, index, p, no, sub):
