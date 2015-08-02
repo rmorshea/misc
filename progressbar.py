@@ -2,6 +2,11 @@
 
 import sys
 
+try:
+    from IPython.display import clear_output as _clear_output
+except ImportError:
+    _clear_output = None
+
 class Progressbar(object):
 
     _clear = True
