@@ -105,15 +105,18 @@ class SearchReplace(Search):
 			content = self.last_find
 		index = Variable(0)
 		current_file = None
+		
 		if not resume:
 			self._on_quit_index = 0
 		if self._on_quit_index != 0:
 			print('resuming replacement search...\n')
+
 		for p,no,l,c in content[self._on_quit_index:]:
 			if self.ignored.get(p,None) and no in self.ignored[p]:
 				continue
 			lno = 'L:'+str(no+1)
 			print(lno+' @ '+p)
+
 			if c==('',''):
 				old = l[:-1]
 			else:
@@ -121,11 +124,19 @@ class SearchReplace(Search):
 				c2 = ('\n'+c[1][:-1]).replace('\n','\n....')
 				old = c1+'\n>>>>'+l[:-1]+c2+'\n'
 			print(old)
+
 			if self.repl_func:
 				sub = self.repl_func(self.pattern, l)
 			else:
 				sub = self.pattern.sub(self.repl_str,l)
+			if not sub.endswith('\n\n'):
+				if not sub.endswith('\n'):
+					sub += '\n\n'
+				else:
+					sub += '\n'
+
 			print('NEW '+ sub)
+
 			if force:
 				self.replacements.append((p,no,sub))
 				if self._index_dict.get(p,None):
@@ -138,6 +149,7 @@ class SearchReplace(Search):
 				out = self._handle_response(rawin,index,p,no,sub)
 				if out == 'kill':
 					break
+
 		if out != 'kill':
 			print('')
 			print('inspecting items stored for review...')
@@ -145,11 +157,12 @@ class SearchReplace(Search):
 			content = list()
 			for i in range(len(self.last_find)):
 				if i in self.review:
-					content.append(last_find[i])
+					content.append(self.last_find[i])
 			self.find_replacements(content)
 
 
 	def _handle_response(self,rawin,index,p,no,sub):
+		print('')
 		if rawin in ('o','open'):
 			return self._handle_open(index,p,no,sub)
 		elif rawin in ('y','yes'):
@@ -162,7 +175,7 @@ class SearchReplace(Search):
 		elif rawin in ('r','review'):
 			self._handle_review(index,p,no)
 		elif rawin in ('i', 'ignore'):
-			self.index += 1
+			index += 1
 			print('')
 		elif rawin in ('h','help'):
 			print(self._help)
