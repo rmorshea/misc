@@ -64,8 +64,9 @@ class SearchReplace(Search):
 			 "searches. Quitted searches, or searches ended on an error, are resumable if\n"
 			 "'resume' is True. To enact marked replacements call `self.perform_replacements()`.\n"
 			 "\ty : mark a given instance for replacement.\n"
-			 "\tn : ignore a given instance during replacement.\n"
-			 "\ti : ignore an instance during replacement and future searches\n"
+			 "\tn : ignore an instance during replacement and future searches.\n"
+			 "\tr : store the instance for a final review after the main search.\n"
+			 "\ti : ignore an instance during replacement"
 			 "\to : open the path at the given line in Sublime Text\n"
 			 "\tq : quit the current replacement search.\n"
 			 "\th : reprints this help text")
@@ -74,6 +75,7 @@ class SearchReplace(Search):
 		super(SearchReplace,self).__init__(rootdir, pattern, filetype, context)
 		self.replacements = list()
 		self.ignored = dict()
+		self.review = dict()
 		if not repl_str and not repl_func:
 			raise ValueError("must provide either 'handle' or 'replament string'")
 		elif repl_str and repl_func:
@@ -93,19 +95,21 @@ class SearchReplace(Search):
 		self.last_find = list(super(SearchReplace,self).find())
 		return self.last_find
 
-	def find_replacements(self, help=False, resume=True, force=False):
+	def find_replacements(self, content=None, help=False, resume=True, force=False):
 		"""mark identified instances for replacement
 
 		For more info set 'help' to True"""
 		if help:
 			self.help()
+		if not content:
+			content = self.last_find
 		index = Variable(0)
 		current_file = None
 		if not resume:
 			self._on_quit_index = 0
 		if self._on_quit_index != 0:
 			print('resuming replacement search...\n')
-		for p,no,l,c in self.last_find[self._on_quit_index:]:
+		for p,no,l,c in content[self._on_quit_index:]:
 			if self.ignored.get(p,None) and no in self.ignored[p]:
 				continue
 			lno = 'L:'+str(no+1)
@@ -132,23 +136,35 @@ class SearchReplace(Search):
 			else:
 				rawin = raw_input('command: ')
 				out = self._handle_response(rawin,index,p,no,sub)
-				if out == 'quit':
+				if out == 'kill':
 					break
+		if out != 'kill':
+			print('')
+			print('inspecting items stored for review...')
+			print('')
+			content = list()
+			for i in range(len(self.last_find)):
+				if i in self.review:p,no,l,c = self.last_find[i]
+					content.append(last_find[i])
+			self.find_replacements(content)
+
 
 	def _handle_response(self,rawin,index,p,no,sub):
-		if rawin == 'o':
-			return self._handle_o(index,p,no,sub)
-		elif rawin == 'y':
-			self._handle_y(index,p,no,sub)
-		elif rawin == 'q':
+		if rawin in ('o','open'):
+			return self._handle_open(index,p,no,sub)
+		elif rawin in ('y','yes'):
+			self._handle_yes(index,p,no,sub)
+		elif rawin in ('q','quit'):
 			self._on_quit_index = index
-			return 'quit'
-		elif rawin == 'i':
-			self._handle_i(index,p,no)
-		elif rawin == 'n':
-			index += 1
+			return 'kill'
+		elif rawin in ('n','no'):
+			self._handle_no(index,p,no)
+		elif rawin in ('r','review'):
+			self._handle_review(index p,no)
+		elif rawin in ('i', 'ignore'):
+			self.index += 1
 			print('')
-		elif rawin =='h':
+		elif rawin in ('h','help'):
 			print(self._help)
 			rawin = raw_input('command: ')
 			return self._handle_response(rawin,index,p,no,sub)
@@ -157,7 +173,7 @@ class SearchReplace(Search):
 			self.help()
 			raise ValueError("must enter 'y','n','o','i','q', or 'h'")
 
-	def _handle_o(self, index, p, no, sub):
+	def _handle_open(self, index, p, no, sub):
 		cmd = 'sublime '+p+':'+str(no+1)+':1'
 		try:
 			subprocess.call(cmd.split(' '))
@@ -175,7 +191,7 @@ class SearchReplace(Search):
 				sub = edit
 		return self._handle_response(rawin,index,p,no,sub)
 
-	def _handle_y(self, index, p, no, sub):
+	def _handle_yes(self, index, p, no, sub):
 		self.replacements.append((p,no,sub))
 		if self._index_dict.get(p,None):
 			self._index_dict[p].append(index.value)
@@ -184,11 +200,16 @@ class SearchReplace(Search):
 		index += 1
 		print('')
 
-	def _handle_i(self, index, p, no):
+	def _handle_no(self, index, p, no):
 		if not self.ignored.get(p,None):
 			self.ignored[p] = [no]
 		elif no not in self.ignored[p]:
 			self.ignored[p].append(no)
+		index += 1
+		print('')
+
+	def _handle_review(self, index, p, no):
+		self.review.append(index.value)
 		index += 1
 		print('')
 
