@@ -66,7 +66,6 @@ class SearchReplace(Search):
 			 "\ty : mark a given instance for replacement.\n"
 			 "\tn : ignore an instance during replacement and future searches.\n"
 			 "\tr : store the instance for a final review after the main search.\n"
-			 "\ti : ignore an instance during replacement"
 			 "\to : open the path at the given line in Sublime Text\n"
 			 "\tq : quit the current replacement search.\n"
 			 "\th : reprints this help text")
@@ -112,7 +111,7 @@ class SearchReplace(Search):
 			print('resuming replacement search...\n')
 
 		out = None
-		
+
 		for p,no,l,c in content[self._on_quit_index:]:
 			if self.ignored.get(p,None) and no in self.ignored[p]:
 				continue
@@ -152,7 +151,6 @@ class SearchReplace(Search):
 					break
 
 		if out != 'kill':
-			print('')
 			print('inspecting items stored for review...')
 			print('')
 			content = list()
@@ -174,9 +172,6 @@ class SearchReplace(Search):
 			self._handle_no(index,p,no)
 		elif rawin in ('r','review'):
 			self._handle_review(index,p,no)
-		elif rawin in ('i', 'ignore'):
-			index += 1
-			print('')
 		elif rawin in ('h','help'):
 			print(self._help)
 			rawin = raw_input('command: ')
