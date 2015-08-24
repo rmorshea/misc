@@ -75,7 +75,7 @@ class SearchReplace(Search):
 		super(SearchReplace,self).__init__(rootdir, pattern, filetype, context)
 		self.replacements = list()
 		self.ignored = dict()
-		self.review = dict()
+		self.review = list()
 		if not repl_str and not repl_func:
 			raise ValueError("must provide either 'handle' or 'replament string'")
 		elif repl_str and repl_func:
@@ -144,7 +144,7 @@ class SearchReplace(Search):
 			print('')
 			content = list()
 			for i in range(len(self.last_find)):
-				if i in self.review:p,no,l,c = self.last_find[i]
+				if i in self.review:
 					content.append(last_find[i])
 			self.find_replacements(content)
 
