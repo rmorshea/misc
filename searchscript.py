@@ -179,7 +179,7 @@ class SearchReplace(Search):
 		else:
 			self._on_quit_index = index
 			self.help()
-			raise ValueError("must enter 'y','n','o','i','q', or 'h'")
+			raise ValueError("must enter 'y','n','r',o','q', or 'h'")
 
 	def _handle_open(self, index, p, no, sub):
 		cmd = 'sublime '+p+':'+str(no+1)+':1'
