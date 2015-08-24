@@ -115,6 +115,7 @@ class SearchReplace(Search):
 			if self.ignored.get(p,None) and no in self.ignored[p]:
 				continue
 			lno = 'L:'+str(no+1)
+			
 			print(lno+' @ '+p)
 
 			if c==('',''):
@@ -123,17 +124,15 @@ class SearchReplace(Search):
 				c1 = ('\n'+c[0][:-1]).replace('\n','\n....')
 				c2 = ('\n'+c[1][:-1]).replace('\n','\n....')
 				old = c1+'\n>>>>'+l[:-1]+c2+'\n'
+
 			print(old)
 
 			if self.repl_func:
 				sub = self.repl_func(self.pattern, l)
 			else:
 				sub = self.pattern.sub(self.repl_str,l)
-			if not sub.endswith('\n\n'):
-				if not sub.endswith('\n'):
-					sub += '\n\n'
-				else:
-					sub += '\n'
+			if not sub.endswith('\n'):
+				sub += '\n'
 
 			print('NEW '+ sub)
 
