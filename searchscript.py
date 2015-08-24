@@ -111,6 +111,8 @@ class SearchReplace(Search):
 		if self._on_quit_index != 0:
 			print('resuming replacement search...\n')
 
+		out = None
+		
 		for p,no,l,c in content[self._on_quit_index:]:
 			if self.ignored.get(p,None) and no in self.ignored[p]:
 				continue
