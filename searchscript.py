@@ -105,7 +105,7 @@ class SearchReplace(Search):
 			content = self.last_find
 		index = Variable(0)
 		current_file = None
-		
+
 		if not resume:
 			self._on_quit_index = 0
 		if self._on_quit_index != 0:
@@ -162,7 +162,6 @@ class SearchReplace(Search):
 
 
 	def _handle_response(self,rawin,index,p,no,sub):
-		print('')
 		if rawin in ('o','open'):
 			return self._handle_open(index,p,no,sub)
 		elif rawin in ('y','yes'):
