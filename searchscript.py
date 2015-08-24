@@ -160,7 +160,7 @@ class SearchReplace(Search):
 		elif rawin in ('n','no'):
 			self._handle_no(index,p,no)
 		elif rawin in ('r','review'):
-			self._handle_review(index p,no)
+			self._handle_review(index,p,no)
 		elif rawin in ('i', 'ignore'):
 			self.index += 1
 			print('')
