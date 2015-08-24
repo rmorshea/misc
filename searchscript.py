@@ -160,7 +160,6 @@ class SearchReplace(Search):
 	def _handle_o(self, index, p, no, sub):
 		cmd = 'sublime '+p+':'+str(no+1)+':1'
 		try:
-			prompt = ''
 			subprocess.call(cmd.split(' '))
 			custom = False
 		except OSError, e:
@@ -171,7 +170,7 @@ class SearchReplace(Search):
 		if custom and edit is None:
 			rawin = 'i'
 		else:
-			rawin = raw_input('command: ' % prompt)
+			rawin = raw_input('command: ')
 			if custom:
 				sub = edit
 		return self._handle_response(rawin,index,p,no,sub)
