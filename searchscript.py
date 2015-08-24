@@ -86,7 +86,7 @@ class SearchReplace(Search):
 		self._on_quit_index = 0
 		self.find()
 
-	def help():
+	def help(self):
 		print(self._help)
 
 	def find(self):
