@@ -171,7 +171,7 @@ class SearchReplace(Search):
 		if custom and edit is None:
 			rawin = 'i'
 		else:
-			rawin = raw_input('confirm %sreplacement: \r' % prompt)
+			rawin = raw_input('command: ' % prompt)
 			if custom:
 				sub = edit
 		return self._handle_response(rawin,index,p,no,sub)
