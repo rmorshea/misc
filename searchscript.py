@@ -157,7 +157,8 @@ class SearchReplace(Search):
 			for i in range(len(self.last_find)):
 				if i in self.review:
 					content.append(self.last_find[i])
-			self.find_replacements(content)
+			if content:
+				self.find_replacements(content)
 
 
 	def _handle_response(self,rawin,index,p,no,sub):
