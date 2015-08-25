@@ -151,14 +151,16 @@ class SearchReplace(Search):
 					break
 
 		if out != 'kill':
-			print('inspecting items stored for review...')
-			print('')
 			content = list()
 			for i in range(len(self.last_find)):
 				if i in self.review:
 					content.append(self.last_find[i])
 			if content:
+				print('inspecting items stored for review...')
+				print('')
 				self.find_replacements(content)
+
+		print('COMPLETE')
 
 
 	def _handle_response(self,rawin,index,p,no,sub):
