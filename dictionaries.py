@@ -8,17 +8,17 @@ class refdict(dict):
     def __setitem__(self, key, value):
         if not isinstance(key, weakref):
             key = weakref(key)
-        s = super(rdict, self)
-        s.__setitem__(ref, value)
+        s = super(refdict, self)
+        s.__setitem__(key, value)
 
     def __getitem__(self, key):
         if isinstance(key, weakref):
-            return super(rdict, self).__getitem__(key)
+            return super(refdict, self).__getitem__(key)
         for ref in [r for r in self]:
             if ref() is None:
                 del self[ref]
             elif key is ref():
-                return super(rdict, self).__getitem__(ref)
+                return super(refdict, self).__getitem__(ref)
         raise KeyError(str(key))
 
     def get(self, key, default=None):
@@ -54,12 +54,12 @@ class refdict(dict):
 
     def values(self):
         self._trim()
-        get = super(rdict, self).__getitem__
+        get = super(refdict, self).__getitem__
         return [get(ref) for ref in self]
 
     def items(self):
         self._trim()
         keys = [ref() for ref in self]
-        get = super(rdict, self).__getitem__
+        get = super(refdict, self).__getitem__
         values = [get(ref) for ref in self]
         return zip(keys, values)
