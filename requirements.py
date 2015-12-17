@@ -148,13 +148,14 @@ class RequiresHandler(EventHandler):
                     for n in names:
                         values[n] = getattr(source, n)
 
-                value = listener(listener.target(), change_cache, values)
+                value = listener(listener.target(), change_cache, values, self)
                 setattr(listener.target(), listener._name, value)
 
                 listener.updating[listener.target()] = False
                 listener.changes = []
 
-    def setup_requirement(self, source, names, target=None):
+    def setup_requirement(self, source, *names, **kwargs):
+        target = kwargs.get('target')
         if target:
             self.target = weakref(target)
         if not self.target():
@@ -177,4 +178,4 @@ class RequiresHandler(EventHandler):
                 t.listeners[source].append(self)
 
     def instance_init(self, inst):
-        self.setup_requirement(inst, self.needs, inst)
+        self.setup_requirement(inst, *self.needs, target=inst)
