@@ -19,17 +19,47 @@ def undo(original):
 
     Returns
     -------
-    A dictionary keyed on file path, whose values where
+    A dictionary keyed on file paths, whose values where
     their original contents. This means, undo could be
     reapplied to restore a modified file state.
     """
     modified = {}
     for path in original:
         with open(path, "r") as file:
-            new[path] = file.read()
+            modified[path] = file.read()
         with open(path, "w") as file:
             file.write(original[path])
     return modified
+
+
+def swapiter(finds, modifier):
+    """Swap sections of a file with modified text
+
+    Paramters
+    ---------
+    finds : dict of dicts
+        A dictionary of the form returned by ``sift`` - A dictionary
+        keyed on matching file paths, whose values are dictionaries
+        keyed on match spans (indices) whose values will be modified
+    modifier : function
+        Takes in a value from the ``finds`` dictionary and returns a
+        new string that will be used to replace the span of the given
+        find.
+
+    Returns
+    -------
+    An iterator which yields paths, and their modified texts.
+    """
+    for path in finds:
+        diff = 0
+        with open(path, "r") as file:
+            text = file.read()
+            for span in sorted(finds[path].keys()):
+                change = modifier(finds[path][span])
+                s0, s1 = (span[0] + diff, span[1] + diff)
+                diff += len(change) - (s1 - s0)
+                text = text[:s0] + change + text[s1:]
+                yield (path, text)
 
 
 def swap(finds, modifier):
@@ -45,21 +75,13 @@ def swap(finds, modifier):
         Takes in a value from the ``finds`` dictionary and returns a
         new string that will be used to replace the span of the given
         find.
+
+    Returns
+    -------
+    A dictionary keyed on file paths, whose
+    values are the original file contents.
     """
-    original = {}
-    for path in finds:
-        with open(path, "r") as file:
-            text = file.read()
-            original[path] = text
-            for span in finds[path]:
-                text = (
-                    text[:span[0]] +
-                    modifier(finds[path][span])
-                    + text[span[1]:]
-                )
-        with open(path, "w") as file:
-            file.write(text)
-    return original
+    return undo(dict(swapiter(finds, modifier)))
 
 
 def sift(files, pattern, context="", schema=None):
@@ -102,7 +124,6 @@ def sift(files, pattern, context="", schema=None):
     finds = {}
     for path in files:
         filefinds = {}
-        finds[path] = filefinds
         with open(path, "r") as file:
             text = file.read()
             for find in pattern.finditer(text):
@@ -113,6 +134,8 @@ def sift(files, pattern, context="", schema=None):
                         context[1].match(text[span[1]:]),
                     )
                 )
+        if filefinds:
+            finds[path] = filefinds
     return finds
 
 
