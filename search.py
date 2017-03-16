@@ -84,7 +84,22 @@ def swap(finds, modifier):
     return undo(dict(swapiter(finds, modifier)))
 
 
-def sift(files, pattern, context="", schema=None):
+class Schema(object):
+
+    def __init__(self, path, index, find, context):
+        self.path = path
+        self.index = index
+        self.find = find
+        self.context = context
+
+    def __iter__(self):
+        yield self.path
+        yield self.index
+        yield self.find
+        yield self.context
+
+
+def sift(files, pattern, context="", schema=Schema):
     """Search files for a given pattern
 
     Parameters
@@ -95,21 +110,21 @@ def sift(files, pattern, context="", schema=None):
         A regex pattern to which each file will be matched
     context : str
         A regex pattern applied adjacent to each match's span.
-    schema : function
+    schema : callable
         Defines how finds are presented in the returned result. By default
-        the schema simply gives the match object passed to ``find``. Its
-        signature must be of the form ``(path, lineno, find, context)``
-        where ``path`` is the path to the matched file, ``lineno`` is the
-        index of the line where the first matched character, ``find`` is
-        a regex match object, and ``context`` is a tuple of two matche
-        objects created by the context pattern.
+        this is the :class:``Schema`` constructor. Its signature must be
+        of the form ``(path, index, find, context)`` where ``path`` is the
+        path to the matched file, ``index`` is the index of the line where
+        the first matched character, ``find`` is a regex match object, and
+        ``context`` is a tuple of two matched objects created by the
+        context pattern.
 
 
     Returns
     -------
     A dictionary keyed on matching file paths, whose values
     are dictionaries keyed on match spans (indices) whose values
-    are defined by the schema function.
+    are defined by the ``schema`` callable.
     """
     pattern = re.compile(pattern)
     
@@ -117,9 +132,6 @@ def sift(files, pattern, context="", schema=None):
         re.compile("[\s\S]*" + context + "\Z"),
         re.compile("\A" + context + "[\s\S]*"),
     )
-    
-    if schema is None:
-        schema = lambda p, t, f, c: f
 
     finds = {}
     for path in files:
